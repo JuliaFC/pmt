@@ -3,11 +3,11 @@ Project I for the IF767 class.
 
 Chosen algorithms:
 
-Boyer Moore
+  Boyer Moore
 
-Aho Corasick
+  Aho Corasick
 
-Sellers
+  Sellers
 
-Wu Manber
+  Wu Manber
 
