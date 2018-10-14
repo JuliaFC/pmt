@@ -1,58 +1,62 @@
-#include "/Users/juniorlima/stdc++.h"
+#include <vector>
+#include <bitset>
+#include <unordered_map>
+#include <iostream>
+#include <boost/dynamic_bitset.hpp>
 
 
 using namespace std;
+using namespace boost;
 
-unordered_map< char, bitset > char_mask(string pattern, vector<char> alphabeth) {
-    int m = pattern.size();
-    unordered_map<char, bitset > c;
+unordered_map< char, dynamic_bitset<> > char_mask(string pattern, vector<char> alphabeth) {
+    const int m = pattern.size();
+    unordered_map<char, dynamic_bitset<> > c;
     
     for (int i=0; i < alphabeth.size(); i++){
-        c[alphabeth[i]] = bitset<m>{}.set();
+        c[alphabeth[i]] = dynamic_bitset<>(m, ~0ul);
     }
     
-    bitset<m> pos_mask;
-    pos_mask.set();
-    pos_mask[0] = 0;
+    dynamic_bitset<> pos_mask(m, ~1ul);
     
-    bitset<m> one;
-    one[0] = 1;
+    dynamic_bitset<> one(m, 1ul);
     
     for (int i=0; i<m; i++) {
-        c[pattern[i]] = c[pattern[i]] &= pos_mask;
-        pos_mask = pos_mask <<= 1;
-        pos_mask = pos_mask |= one;
+        c[pattern[i]] = c[pattern[i]] & pos_mask;
+        pos_mask = pos_mask << 1;
+        pos_mask = pos_mask | one;
     }
-    
+
     return c;
 }
 
 
 vector<int> wu_manber(string text, string pattern, vector<char> alphabeth, int distance) {
-    int n = text.size();
-    int m = pattern.size();
-    unordered_map<char, bitset> c = char_mask(pattern, alphabeth);
-    vector < bitset<m> > S;
-    
-    for(int i=0; i < distance+1; i++) {
-        S[i] = bitset<m>{}.set();
-    }
+    const int n = text.size();
+    const int m = pattern.size();
+    unordered_map<char, dynamic_bitset<> > c = char_mask(pattern, alphabeth);
+    vector < dynamic_bitset<> > s(distance+1, dynamic_bitset<>(m, ~0));
     
     vector<int> occ;
-    bitset<m> sprev;
-    bitset<m> sprev2;
-    
+    dynamic_bitset<> sprev(m);
+    dynamic_bitset<> sprev2(m);
+
     for(int i=0; i<n; i++) {
-        S[0] = (S[0] <<= 1) |= C[text[j]];
-        sprev = S[0];
-        for (int j =0; j < distance+1; j++) {
-            sprev2 = S[j];
-            S[j] = ( (S[j] <<= 1) |= c[text[j]] ) &= (S[j-1] <<= 1) &= (sprev <<= 1) &= sprev;
+        
+        s[0] = (s[0] << 1) | c[text[i]];
+        
+        sprev = s[0];
+        
+        for (int j = 1; j < distance+1; j++) {
+            sprev2 = s[j];
+            s[j] = ( (s[j] << 1) | c[text[i]] )
+                    & (s[j-1] << 1)
+                    & (sprev << 1)
+                    & sprev;
             sprev = sprev2;
         }
-        
-        if (S[distance][0] == 0)
-            occ.push_back(j);
+
+        if (s[distance][m-1] == 0)
+            occ.push_back(i);
     }
     
     return occ;
@@ -61,15 +65,15 @@ vector<int> wu_manber(string text, string pattern, vector<char> alphabeth, int d
 int main() {
     
     string txt = "abadac";
-    string pattern = "cada"
+    string pattern = "cada";
     string alphabeth = "abcd";
     int distance = 2;
     std::vector<char> alph(alphabeth.begin(), alphabeth.end());
     
-    std::vector<int> occ = wu_manber(text, pattern, alph, distance);
+    std::vector<int> occ = wu_manber(txt, pattern, alph, distance);
     
     for(int i=0; i < occ.size(); i++) {
-        cout << "found in position: " << occ[i] << endl;
+        std::cout << "found in position: " << occ[i] << endl;
     }
     
     return 0;
