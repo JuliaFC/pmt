@@ -110,11 +110,11 @@ std::vector<int> res(patterns.size(), 0);
 
 int state = 0, max_length = GetMaxLength(patterns);
 
-for(int i=0; i<MAXCHAR; i++){
+for(int i=0; i<max_length; i++){
   go2.push_back(vector<int>(MAXCHAR, -1));
 }
-occ.assign(MAXCHAR, 0);
-fail.assign(MAXCHAR, -1);
+occ.assign(max_length, 0);
+fail.assign(max_length, -1);
 
 BuildFSM(patterns, go2, occ);
 //PrintGo2(go2);
