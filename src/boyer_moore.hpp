@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 class BoyerMoore
 {
@@ -10,10 +11,11 @@ private:
     std::vector<int> _s;
     std::string _pattern;
     std::vector<char> _alphabeth;
+    std::string _lineprefix;
     int _count;
-    int _j;
+    int _readedCount;
 
-    std::unordered_map<char, int> buildBadChar(const std::string& pattern, const std::vector<char> alphabeth) {
+    std::unordered_map<char, int> buildBadChar(const std::string& pattern, const std::vector<char> &alphabeth) {
         int m = pattern.size();
         int l = alphabeth.size();
         std::unordered_map<char, int> map;
@@ -70,43 +72,64 @@ private:
         this->setPattern(pattern, alphabeth);
     };
 
-    ~BoyerMoore();
+    ~BoyerMoore(){};
 
     void setPattern(const std::string& pattern, std::vector<char> alphabeth){
         _pattern = pattern;
         _alphabeth = alphabeth;
         _c = buildBadChar(_pattern, _alphabeth);
         _s = buildGoodSuffix(_pattern);
-        _j = -1;
+        _count = 0;
+        _readedCount = 0;
     }
 
-    void search(const std::string& text) {
+    bool search(std::string text, bool isCompleteLine) {
+        
+        if (!_lineprefix.empty()) text = _lineprefix + text;
+
         int n = text.size();
         int m = _pattern.size();
         int l = _alphabeth.size();
 
         int i = 0;
         int j = m - 1;
+        bool ans = false;
 
-        while (i <= n - m)
-        {
+        while (i <= n - m) {
             j = m - 1;
             while (j >= 0 && text[i + j] == _pattern[j])
                 j -= 1;
 
-            if (j == -1)
-            {
+            if (j == -1) {
+                ans = true;
                 _count++;
-                i += _s[_s.size() - 1];
-            }
-            else
-            {
+                i += _s.back();
+            } else {
                 i += std::max(_s[j], j - _c[text[i + j]]);
             }
         }
 
+        if (!isCompleteLine) {
+            _lineprefix = text.substr(std::max(0, n - m + 1));
+            _readedCount += n - m + 1;
+        } else {
+            _lineprefix.clear();
+            _readedCount = 0;
+        }
+        return ans;
     }
-    void reset();
+
+    void reset() {
+        _c.clear();
+        _s.clear();
+        _pattern = "";
+        _alphabeth.clear();
+        _count = 0;
+    }
+
+    int count(){
+        return _count;
+    }
 };
 
 
