@@ -67,7 +67,7 @@ private:
         return good_suffix;
     };
 
-  public:
+public:
     BoyerMoore(const std::string& pattern, std::vector<char> alphabeth){
         this->setPattern(pattern, alphabeth);
     };
