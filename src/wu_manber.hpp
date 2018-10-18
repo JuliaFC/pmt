@@ -4,7 +4,6 @@
 #include <vector>
 #include <unordered_map>
 #include <iostream>
-#include <boost/dynamic_bitset.hpp>
 #include "searcher.hpp"
 
 class WuManber : public Searcher
@@ -12,29 +11,38 @@ class WuManber : public Searcher
 private:
     std::string _pattern;
     std::vector<char> _alphabeth;
-    std::unordered_map<char, boost::dynamic_bitset<> > _charMask;
-    std::vector < boost::dynamic_bitset<> > _s;
+    std::unordered_map<char, uint_fast64_t > _charMask;
+    std::vector < uint_fast64_t > _s;
     int _count;
     int _distance;
     int _readedCount;
 
-    std::unordered_map<char, boost::dynamic_bitset<> > buildCharMask(std::string pattern, std::vector<char> alphabeth) {
+    std::unordered_map<char, uint_fast64_t > buildCharMask(std::string pattern, std::vector<char> alphabeth) {
         const int m = pattern.size();
-        std::unordered_map< char, boost::dynamic_bitset<> > c;
+        std::unordered_map< char, uint_fast64_t > c;
 
         for (int i = 0; i < alphabeth.size(); i++)
         {
-            c[alphabeth[i]] = boost::dynamic_bitset<>(m, ~0ul);
+            c[alphabeth[i]] = ~0ull;
         }
 
-        boost::dynamic_bitset<> pos_mask(m, ~1ul);
+        uint_fast64_t pos_mask =  ~1ull;
 
-        boost::dynamic_bitset<> one(m, 1ul);
+        uint_fast64_t one =  1ull;
 
         for (int i = 0; i < m; i++) {
             c[pattern[i]] = c[pattern[i]] & pos_mask;
             pos_mask = pos_mask << 1;
             pos_mask = pos_mask | one;
+        }
+
+        for(int i=0; i < m; i++){
+            for(int j=0; j < 65; j++){
+                std::cout << ((c[pattern[i]] & (1ull << j)) == (1ull << j));
+            }
+
+            std::cout << std::endl;
+            
         }
 
         return c;
@@ -64,15 +72,17 @@ public:
         bool ans = false;
         
         if (_s.empty()){
-            _s = std::vector< boost::dynamic_bitset<> >(_distance + 1, boost::dynamic_bitset<>(m, ~0));
+            _s = std::vector< uint_fast64_t >(_distance + 1, ~0ull);
 
             for (int i = 1; i <= _distance; i++) {
                 _s[i] = _s[i - 1] << 1;
             }
         }
         
-        boost::dynamic_bitset<> sprev(m);
-        boost::dynamic_bitset<> sprev2(m);
+        uint_fast64_t sprev;
+        uint_fast64_t sprev2;
+
+        uint_fast64_t msk = 1ULL << (m - 1);
 
         
         for (int i = 0; i < n; i++) {
@@ -87,14 +97,14 @@ public:
                 sprev = sprev2;
             }
 
-            if (_s[_distance][m - 1] == 0) {
+            if (!_s[_distance] & msk) {
                 _count++;
                 ans = true;
             }               
         }
 
         if (isCompleteLine){
-            _s = std::vector< boost::dynamic_bitset<> >(_distance + 1, boost::dynamic_bitset<>(m, ~0));
+            _s = std::vector< uint_fast64_t >(_distance + 1, ~0ull);
             for (int i = 1; i <= _distance; i++) {
                 _s[i] = _s[i - 1] << 1;
             }
