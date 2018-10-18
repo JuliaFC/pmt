@@ -23,7 +23,7 @@ private:
 
         for (int i = 0; i < alphabeth.size(); i++)
         {
-            c[alphabeth[i]] = ~0ull;
+            c[alphabeth[i]] = ~0ull >> (64 - m);
         }
 
         uint_fast64_t pos_mask =  ~1ull;
@@ -34,15 +34,6 @@ private:
             c[pattern[i]] = c[pattern[i]] & pos_mask;
             pos_mask = pos_mask << 1;
             pos_mask = pos_mask | one;
-        }
-
-        for(int i=0; i < m; i++){
-            for(int j=0; j < 65; j++){
-                std::cout << ((c[pattern[i]] & (1ull << j)) == (1ull << j));
-            }
-
-            std::cout << std::endl;
-            
         }
 
         return c;
@@ -72,10 +63,11 @@ public:
         bool ans = false;
         
         if (_s.empty()){
-            _s = std::vector< uint_fast64_t >(_distance + 1, ~0ull);
+            _s = std::vector< uint_fast64_t >(_distance + 1, ~0ull >> (64 - m));
 
-            for (int i = 1; i <= _distance; i++) {
-                _s[i] = _s[i - 1] << 1;
+            for (int i = 0; i <= _distance; i++) {
+                _s[i] = _s[i] << 1;
+                //_s[i] = (_s[i - 1] << 1) & _s[0]; das anotações
             }
         }
         
@@ -83,13 +75,12 @@ public:
         uint_fast64_t sprev2;
 
         uint_fast64_t msk = 1ULL << (m - 1);
-
         
         for (int i = 0; i < n; i++) {
-
+            
             sprev = _s[0];
 
-            _s[0] = (_s[0] << 1) | _charMask[text[i]];
+            _s[0] = ((_s[0] << 1) | _charMask[text[i]]) & (~uint_fast64_t(0) >> (64 - m));
 
             for (int j = 1; j < _distance + 1; j++) {
                 sprev2 = _s[j];
@@ -97,16 +88,16 @@ public:
                 sprev = sprev2;
             }
 
-            if (!_s[_distance] & msk) {
+            if (_s[_distance] < msk) {
                 _count++;
                 ans = true;
             }               
         }
 
         if (isCompleteLine){
-            _s = std::vector< uint_fast64_t >(_distance + 1, ~0ull);
+            _s = std::vector< uint_fast64_t >(_distance + 1, ~0ull >> (64 - m));
             for (int i = 1; i <= _distance; i++) {
-                _s[i] = _s[i - 1] << 1;
+                _s[i] = _s[i - 1] << 1 & _s[0];
             }
             _readedCount = 0;
         } else _readedCount += n;
