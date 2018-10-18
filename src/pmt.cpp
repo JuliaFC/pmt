@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <string>
 #include <vector>
+#include <sstream>
 #include "file_reader.hpp"
 #include "boyer_moore.hpp"
 #include "sellers.hpp"
@@ -61,61 +62,18 @@ Algorithm chooseAlgorithm(RunInfo info) {
 }
 
 void executeAlgorithm(RunInfo info){
-      
+
+      Searcher * s;
+      std::vector<char> alph;
+
+      for (int i = 0; i < 256; i++) {
+            alph.push_back(char(i));
+      }
+
       switch (info.chosenAlgorithm)
       {
-            case BOYER_MOORE: {
-                  
-                  std::vector<char> alph;
-
-                  for (int i = 0; i < 256; i++) {
-                        alph.push_back(char(i));
-                  }
-
-                  for (int i=0; i < info.patterns.size(); i++) {
-                        BoyerMoore b(info.patterns[i], alph);
-                        
-                        for (int j=0; j < info.textFiles.size(); j++) {
-                              FileReader fr(info.textFiles[j]);
-
-                              string fullline, line;
-
-                              int ret = fr.getLine(line);
-                              if(ret == -1) continue;
-
-                              int lineCount = 0;
-                              bool countedLine = false;
-                              bool found = false;
-
-                              do {
-                                    if(!info.isCountMode) fullline += line;
-                                    
-                                    found = b.search(line, ret == 0);
-                                    
-                                    if(found && !countedLine) {
-                                          lineCount++;
-                                          countedLine = true;
-                                    }
-
-                                    if (ret == 0 && countedLine && !info.isCountMode)
-                                          cout << fullline << endl;
-
-                                    if (ret == 0) {
-                                          fullline = "";
-                                          countedLine = false;
-                                    }
-
-                                    ret = fr.getLine(line);
-
-                              } while(ret != -1);
-
-                              if(info.isCountMode){
-                                    printf("Total occurrences: %d\n",b.count());
-                              } else {
-                                    printf("Number of lines: %d\n", lineCount);
-                              }
-                        }
-                  }     
+            case BOYER_MOORE:{
+                  s = new BoyerMoore(info.patterns[0], alph);
                   break;
             }
             case AHO_CORASICK:{
@@ -123,128 +81,64 @@ void executeAlgorithm(RunInfo info){
                   break;
             }
             case SELLERS:{
-
-                  for (int i = 0; i < info.patterns.size(); i++)
-                  {
-                        Sellers s(info.patterns[i], info.distance);
-
-                        for (int j = 0; j < info.textFiles.size(); j++)
-                        {
-                              FileReader fr(info.textFiles[j]);
-
-                              string fullline, line;
-
-                              int ret = fr.getLine(line);
-                              if (ret == -1)
-                                    continue;
-
-                              int lineCount = 0;
-                              bool countedLine = false;
-                              bool found = false;
-
-                              do
-                              {
-                                    if (!info.isCountMode)
-                                          fullline += line;
-
-                                    found = s.search(line, ret == 0);
-
-                                    if (found && !countedLine)
-                                    {
-                                          lineCount++;
-                                          countedLine = true;
-                                    }
-
-                                    if (ret == 0 && countedLine && !info.isCountMode)
-                                          cout << fullline << endl;
-
-                                    if (ret == 0)
-                                    {
-                                          fullline = "";
-                                          countedLine = false;
-                                    }
-
-                                    ret = fr.getLine(line);
-
-                              } while (ret != -1);
-
-                              if (info.isCountMode)
-                              {
-                                    printf("Total occurrences: %d\n", s.count());
-                              }
-                              else
-                              {
-                                    printf("Number of lines: %d\n", lineCount);
-                              }
-                        }
-                  }
+                  s = new Sellers(info.patterns[0], info.distance);
                   break;
             }
             case WU_MAMBER:{
-                  std::vector<char> alph;
-
-                  for (int i = 0; i < 256; i++)
-                  {
-                        alph.push_back(char(i));
-                  }
-
-                  for (int i = 0; i < info.patterns.size(); i++)
-                  {
-                        WuManber wm(info.patterns[i], alph, info.distance);
-
-                        for (int j = 0; j < info.textFiles.size(); j++)
-                        {
-                              FileReader fr(info.textFiles[j]);
-
-                              string fullline, line;
-
-                              int ret = fr.getLine(line);
-                              if (ret == -1)
-                                    continue;
-
-                              int lineCount = 0;
-                              bool countedLine = false;
-                              bool found = false;
-
-                              do
-                              {
-                                    if (!info.isCountMode)
-                                          fullline += line;
-
-                                    found = wm.search(line, ret == 0);
-
-                                    if (found && !countedLine)
-                                    {
-                                          lineCount++;
-                                          countedLine = true;
-                                    }
-
-                                    if (ret == 0 && countedLine && !info.isCountMode)
-                                          cout << fullline << endl;
-
-                                    if (ret == 0)
-                                    {
-                                          fullline = "";
-                                          countedLine = false;
-                                    }
-
-                                    ret = fr.getLine(line);
-
-                              } while (ret != -1);
-
-                              if (info.isCountMode)
-                              {
-                                    printf("Total occurrences: %d\n", wm.count());
-                              }
-                              else
-                              {
-                                    printf("Number of lines: %d\n", lineCount);
-                              }
-                        }
-                  }
+                  s = new WuManber(info.patterns[0], alph, info.distance);
                   break;
             }
       }
+      int i=1;
+      
+      do {
+            for(string textname : info.textFiles) {
+                  FileReader fr(textname);
+
+                  std::stringstream fullline;
+                  
+                  string line;
+
+                  int ret = fr.getLine(line);
+                  if(ret == -1) continue;
+
+                  int lineCount = 0;
+                  bool countedLine = false, found = false;
+
+                  do {
+                        if(!info.isCountMode) fullline << line;
+
+                        found = s->search(line, ret == 0);
+
+                        if (found && !countedLine) {
+                              lineCount++;
+                              countedLine = true;
+                        }
+
+                        if(ret == 0 && countedLine && !info.isCountMode)
+                              printf("%s\n", fullline.str().c_str());
+                        
+                        if(ret == 0){
+                              fullline.str(std::string());
+                              countedLine = false;
+                        }
+
+                        ret = fr.getLine(line);
+
+                  } while(ret != -1);
+
+                  if (info.isCountMode) {
+                        printf("Total occurrences: %d\n", s->count());
+                  } else {
+                        printf("Number of lines: %d\n", lineCount);
+                  }
+            }
+
+            if(i < info.patterns.size()) s->resetPattern(info.patterns[i]);
+            i++;
+      } while( i <= info.patterns.size());
+
+
 }
 
 int main(int argc, char *argv[])
@@ -277,7 +171,7 @@ int main(int argc, char *argv[])
                   {
                         algorithm = optarg;
                         
-                        for(int i=0; i < pmt_algorithms.size(); i++){
+                        for(int i=0; i < pmt_algorithms.size(); i++) {
                               if (pmt_algorithms[i] == algorithm) {
                                     info.chosenAlgorithm = Algorithm(i+1);
                               }      

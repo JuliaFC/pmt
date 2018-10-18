@@ -10,6 +10,9 @@
  * 
  */
 
+#ifndef FILE_READER_H
+#define FILE_READER_H
+
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -23,7 +26,7 @@ class FileReader {
      * @brief Size of text chunk
      * 
      */
-    static const int BUFFER_SIZE = 16384;
+    static const int BUFFER_SIZE = 327680;
 
 public:
     /**
@@ -45,7 +48,9 @@ public:
      * @brief Destroy the File Reader object
      * 
      */
-    ~FileReader(){}; 
+    ~FileReader(){
+        close(this->_fileDescriptor);
+    }; 
 
     /**
      * @brief Check if the file exist, open the file, create a file descriptor and 
@@ -157,3 +162,5 @@ private:
         posix_fadvise(_fileDescriptor, 0, 0, 1); // FDADVICE_SEQUENTIAL
     }
 };
+
+#endif

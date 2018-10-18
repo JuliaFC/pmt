@@ -5,8 +5,8 @@
 using namespace std;
 
 void testSimple(){
-    string txt = "abadac";
-    string pat = "cada";
+    string txt = "like";
+    string pat = "love";
 
     std::vector<char> alph;
 

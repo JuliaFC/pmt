@@ -1,10 +1,14 @@
+#ifndef SELLERS_H
+#define SELLERS_H
+
 #include <vector>
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include "searcher.hpp"
 
 
-class Sellers
+class Sellers : public Searcher
 {
 private:
     std::string _pattern;
@@ -36,13 +40,13 @@ private:
         int n = text.length(), m = _pattern.length();
         
         if (n == 0) {
-            this->reset(m);
+            this->reset();
             return false;
         } 
 
         bool ans = false;
 
-        if(_dp.empty()) this->reset(m);
+        if(_dp.empty()) this->reset();
         
         for (int i = 0; i < n; i++) {
             _dp[_last][0] = 0;
@@ -62,14 +66,15 @@ private:
             _prev = (_prev + 1) % 2;
         }
 
-        if(isCompleteLine) this->reset(m);   
+        if(isCompleteLine) this->reset();   
         else _readedCount += n;
         
 
         return ans;
     };
 
-    void reset(int m){
+    void reset(){
+        int m = _pattern.size();
          _dp = std::vector< std::vector<int> >(2, std::vector<int>(m + 1, 0));
 
         for (int i = 0; i < 2; i++) {
@@ -83,8 +88,16 @@ private:
         _readedCount = 0;
     }
 
+    void resetPattern(std::string pattern){
+        _pattern = pattern;
+        _count = 0;
+        _readedCount = 0;
+        this->reset();
+    }
+
     int count(){
         return _count;
     }
 };
 
+#endif

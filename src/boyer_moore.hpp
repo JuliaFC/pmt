@@ -1,10 +1,14 @@
+#ifndef BOYER_MOORE_H
+#define BOYER_MOORE_H
+
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include "searcher.hpp"
 
-class BoyerMoore
+class BoyerMoore : public Searcher
 {
 private:
     std::unordered_map <char, int> _c;
@@ -81,6 +85,7 @@ public:
         _s = buildGoodSuffix(_pattern);
         _count = 0;
         _readedCount = 0;
+        _lineprefix.clear();
     }
 
     bool search(std::string text, bool isCompleteLine) {
@@ -130,6 +135,15 @@ public:
     int count(){
         return _count;
     }
+
+    void resetPattern(std::string pattern){
+        _pattern = pattern;
+        _c = buildBadChar(_pattern, _alphabeth);
+        _s = buildGoodSuffix(_pattern);
+        _count = 0;
+        _readedCount = 0;
+        _lineprefix.clear();
+    }
 };
 
-
+#endif
