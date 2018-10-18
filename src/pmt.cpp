@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <string>
 #include <vector>
+#include "file_reader.hpp"
 
 
 using namespace std;
@@ -34,11 +35,34 @@ typedef struct RunInfo {
 } RunInfo;
 
 vector<string> parserPatternFile(string filename){
+      vector<string> p;
+      FileReader f(filename);
 
+      string fullline, line;
+
+      int ret = f.getLine(line);
+      if (ret == -1) return p;
+
+      do {
+            fullline += line;
+            if (ret == 0){
+                  if (!fullline.empty()) p.push_back(fullline);
+                  fullline = "";
+            }
+            ret = f.getLine(line);
+      } while(ret != -1);
 }
 
 Algorithm chooseAlgorithm(RunInfo info) {
-      return AHO_CORASICK;
+      if (info.isExact) {
+           if ( info.patterns.size() > 1 ) return AHO_CORASICK;
+           else return BOYER_MOORE;
+      } else {
+            if (info.patterns.size() > 1)
+                  return SELLERS;
+            else
+                  return WU_MAMBER;
+      }
 }
 
 void executeAlgorithm(RunInfo info){
@@ -73,7 +97,6 @@ int main(int argc, char *argv[])
 
                   case 'a':
                   {
-                        //printf("option -a with arg %s\n", optarg);
                         algorithm = optarg;
                         
                         for(int i=0; i < pmt_algorithms.size(); i++){
@@ -84,21 +107,19 @@ int main(int argc, char *argv[])
 
                         if (info.chosenAlgorithm == NONE) {
                               printf("Invalid algorithm name.\n");
-                              exit(0);
+                              exit(1);
                         }
                   
                   break;
                   }
 
                   case 'c':                  
-                        //printf("option -c\n");
                         info.isCountMode = true;
                   break;
 
                   
                   case 'e':
                         int distance;                  
-                        //("option -e with arg %s\n", optarg);
                         sscanf(optarg, "%d", &distance);
                         info.isExact = false;
                         info.distance = distance;                  
@@ -117,13 +138,12 @@ int main(int argc, char *argv[])
                   break;
 
                   case 'p':                  
-                        //printf("option -p with arg %s\n", optarg);
                         info.patterns = parserPatternFile(optarg);                  
                   break;
 
                   case '?':
                         printf("Invalid argument. Please try again.\n");
-                        exit(0);
+                        exit(1);
                   break;
                   default:
                         abort();
@@ -135,10 +155,12 @@ int main(int argc, char *argv[])
 
       if (argc - optind < neededArgs) {
             printf("Not enought arguments.\n");
-            exit(0);
+            exit(1);
       }
 
       if(info.patterns.empty()) info.patterns.push_back(argv[optind++]);
+
+      for(int i=0; i < info.patterns.size(); i++) cout << info.patterns[i] << endl;
 
       for(; optind < argc; optind++) info.textFiles.push_back(argv[optind]);
 
@@ -146,12 +168,12 @@ int main(int argc, char *argv[])
 
       if(info.isExact && (info.chosenAlgorithm == SELLERS || info.chosenAlgorithm == WU_MAMBER)){
             printf("Error: Algorithm %s is not suitable to exact matching.\n", pmt_algorithms[info.chosenAlgorithm - 1].c_str());
-            exit(0);
+            exit(1);
       }
 
       if (!info.isExact && (info.chosenAlgorithm == BOYER_MOORE || info.chosenAlgorithm == AHO_CORASICK)) {
             printf("Error: Algorithm %s is not suitable to approximate matching.\n", pmt_algorithms[info.chosenAlgorithm - 1].c_str());
-            exit(0);
+            exit(1);
       }
 
       executeAlgorithm(info);
