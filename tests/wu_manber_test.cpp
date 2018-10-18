@@ -43,6 +43,7 @@ int main() {
     do
     {
         bool res = w.search(line, (ret == 0));
+        
         if(res && !countedLine) {
             count++;
             countedLine = true;
@@ -53,7 +54,6 @@ int main() {
         }
 
         ret = fr.getLine(line);
-
         
     } while (ret != -1);
 
