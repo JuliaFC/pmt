@@ -1,9 +1,14 @@
+#ifndef WU_MANBER
+#define WU_MANBER
+
 #include <vector>
 #include <unordered_map>
 #include <iostream>
 #include <boost/dynamic_bitset.hpp>
+#include "searcher.hpp"
 
-class WuManber {
+class WuManber : public Searcher
+{
 private:
     std::string _pattern;
     std::vector<char> _alphabeth;
@@ -83,7 +88,6 @@ public:
             }
 
             if (_s[_distance][m - 1] == 0) {
-                //std::cout << i << std::endl;
                 _count++;
                 ans = true;
             }               
@@ -112,4 +116,11 @@ public:
     int count(){
         return _count;
     };
+
+    void resetPattern(std::string pattern){
+        this->reset();
+        this->setPattern(pattern, _alphabeth, _distance);
+    }
 };
+
+#endif

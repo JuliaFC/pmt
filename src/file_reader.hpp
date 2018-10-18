@@ -10,6 +10,9 @@
  * 
  */
 
+#ifndef FILE_READER_H
+#define FILE_READER_H
+
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -157,3 +160,5 @@ private:
         posix_fadvise(_fileDescriptor, 0, 0, 1); // FDADVICE_SEQUENTIAL
     }
 };
+
+#endif
