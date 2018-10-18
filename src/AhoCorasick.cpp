@@ -1,5 +1,8 @@
 #include <bits/stdc++.h>
-#include <string.h>
+#include <string>
+#include <fstream>
+#include <ostream>
+
 
 using namespace std;
 #define MAXCHAR 256
@@ -101,12 +104,11 @@ void PrintFail(vector<int> &fail){
 }
 
 
-std::vector<int> AhoCorasick(const std::string &text, const std::vector<string> &patterns){
+void AhoCorasick(const std::string &text, const std::vector<string> &patterns, std::vector<int> &res){
 
 std::vector<vector<int>> go2;
 std::vector<int> occ;
 std::vector<int> fail;
-std::vector<int> res(patterns.size(), 0);
 
 int state = 0, max_length = GetMaxLength(patterns);
 
@@ -134,17 +136,18 @@ for(int i=0; i<text.size(); i++){
     }
   }
 }
-return res;
+return;
 }
 
 
 int main(){
   std::string text = "She sells seashells by the seashore.The shells she sells are surely seashells.So if she sells shells on the seashore,I'm sure she sells seashore shells.";
   std::vector<string> patterns  = {"he", "she", "hers", "his"};
-  std::vector<int> res;
+  std::vector<int> res(patterns.size(), 0);
 
-  res = AhoCorasick(text, patterns);
-  cout << "case insensitive algorithm" << endl;
+  AhoCorasick(text, patterns, res);
+
+  cout << "case sensitive algorithm" << endl;
   for(int i=0; i<patterns.size(); i++){
     cout << res[i] << " occurences of " << patterns[i] << endl;
   }
