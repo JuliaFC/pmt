@@ -85,6 +85,7 @@ public:
         _s = buildGoodSuffix(_pattern);
         _count = 0;
         _readedCount = 0;
+        _lineprefix.clear();
     }
 
     bool search(std::string text, bool isCompleteLine) {

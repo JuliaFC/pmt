@@ -26,7 +26,7 @@ class FileReader {
      * @brief Size of text chunk
      * 
      */
-    static const int BUFFER_SIZE = 16384;
+    static const int BUFFER_SIZE = 327680;
 
 public:
     /**
@@ -48,7 +48,9 @@ public:
      * @brief Destroy the File Reader object
      * 
      */
-    ~FileReader(){}; 
+    ~FileReader(){
+        close(this->_fileDescriptor);
+    }; 
 
     /**
      * @brief Check if the file exist, open the file, create a file descriptor and 

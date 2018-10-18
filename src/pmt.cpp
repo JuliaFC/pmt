@@ -91,7 +91,7 @@ void executeAlgorithm(RunInfo info){
       }
       int i=1;
       
-      for(; i <= info.patterns.size(); i++) {
+      do {
             for(string textname : info.textFiles) {
                   FileReader fr(textname);
 
@@ -135,7 +135,8 @@ void executeAlgorithm(RunInfo info){
             }
 
             if(i < info.patterns.size()) s->resetPattern(info.patterns[i]);
-      }
+            i++;
+      } while( i <= info.patterns.size());
 
 
 }
@@ -170,7 +171,7 @@ int main(int argc, char *argv[])
                   {
                         algorithm = optarg;
                         
-                        for(int i=0; i < pmt_algorithms.size(); i++){
+                        for(int i=0; i < pmt_algorithms.size(); i++) {
                               if (pmt_algorithms[i] == algorithm) {
                                     info.chosenAlgorithm = Algorithm(i+1);
                               }      
