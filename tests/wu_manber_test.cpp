@@ -42,19 +42,22 @@ int main() {
     bool countedLine = false;
     do
     {
-        bool res = w.search(line, (ret != 1));
+        bool res = w.search(line, (ret == 0));
         if(res && !countedLine) {
             count++;
             countedLine = true;
         }
-        ret = fr.getLine(line);
+
         if(ret == 0) {
             countedLine = false;
         }
+
+        ret = fr.getLine(line);
+
         
     } while (ret != -1);
 
-    cout << w.count() << endl;
+    cout << count << endl;
 
     //testSimple();
     return 0;

@@ -5,15 +5,13 @@
 using namespace std;
 
 void sampleTesting(){
-    std::string text = "abad";
-    std::string text2 = "ac";
-    std::string pat = "cada";
+    std::string text = "This is the 100th Etext file presented by Project Gutenberg, and";
+    std::string pat = "love";
     int err = 2;
 
     Sellers s(pat, err);
 
     s.search(text, false);
-    s.search(text2, true);
 
     cout << s.count() << endl;
 }
@@ -28,13 +26,33 @@ void textfileTest(){
 
     Sellers s(pat, distance);
     int ret = fr.getLine(line);
+    int res;
+    int count =0;
+    bool lineCounted = false;
+    string fullline = "";
+
     do
     {
-        s.search(line, (ret != 1));
+        fullline += line;
+        
+        res = s.search(line, (ret == 0));
+        
+        if (res && !lineCounted) {
+            count++;
+            lineCounted = true;
+        }
+
+        if (ret == 0 && lineCounted) cout << fullline << endl;
+
+        if (ret == 0) {
+            fullline = "";
+            lineCounted = false;
+        }
         ret = fr.getLine(line);
+        
     } while (ret != -1);
 
-    cout << s.count() << endl;
+    cout << count << endl;
 }
 
 int main(int argc, char const *argv[])

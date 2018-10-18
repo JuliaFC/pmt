@@ -96,6 +96,8 @@ public:
             _bytesRead = read(_fileDescriptor, _buffer, BUFFER_SIZE);
             _linePointer = this->_buffer;
 
+            size = (int) ((_buffer + _bytesRead) - _linePointer);
+
             // If can't read buffer, reach EOF
             if (!_bytesRead) { 
                 return -1;
