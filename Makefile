@@ -1,6 +1,6 @@
 all: 
 	@mkdir -p bin
-	@g++ -w -o bin/pmt src/pmt.cpp
+	@g++ -std=c++11 -w -o bin/pmt src/pmt.cpp
 	@export PATH=$PATH:/bin
 
 clean:
