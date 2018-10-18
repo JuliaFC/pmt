@@ -91,14 +91,14 @@ int main(int argc, char *argv[])
                   }
 
                   case 'c':                  
-                        printf("option -c\n");
+                        //printf("option -c\n");
                         info.isCountMode = true;
                   break;
 
                   
                   case 'e':
                         int distance;                  
-                        printf("option -e with arg %s\n", optarg);
+                        //("option -e with arg %s\n", optarg);
                         sscanf(optarg, "%d", &distance);
                         info.isExact = false;
                         info.distance = distance;                  
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
                   break;
 
                   case 'p':                  
-                        printf("option -p with arg %s\n", optarg);
+                        //printf("option -p with arg %s\n", optarg);
                         info.patterns = parserPatternFile(optarg);                  
                   break;
 
@@ -143,6 +143,16 @@ int main(int argc, char *argv[])
       for(; optind < argc; optind++) info.textFiles.push_back(argv[optind]);
 
       if (info.chosenAlgorithm == NONE) info.chosenAlgorithm = chooseAlgorithm(info);
+
+      if(info.isExact && (info.chosenAlgorithm == SELLERS || info.chosenAlgorithm == WU_MAMBER)){
+            printf("Error: Algorithm %s is not suitable to exact matching.\n", pmt_algorithms[info.chosenAlgorithm - 1].c_str());
+            exit(0);
+      }
+
+      if (!info.isExact && (info.chosenAlgorithm == BOYER_MOORE || info.chosenAlgorithm == AHO_CORASICK)) {
+            printf("Error: Algorithm %s is not suitable to approximate matching.\n", pmt_algorithms[info.chosenAlgorithm - 1].c_str());
+            exit(0);
+      }
 
       executeAlgorithm(info);
 
