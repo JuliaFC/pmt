@@ -16,6 +16,7 @@ private:
   std::vector<int> _count;
   std::vector<int> _fail;
   int _maxlength;
+  int _readedCount;
 
 int GetMaxLength(std::vector<std::string> patterns){
 
@@ -28,48 +29,13 @@ int GetMaxLength(std::vector<std::string> patterns){
 
 public:
 
-void TestPatterns(){
-
-	for(auto p : _patterns){
-		std::cout << "[" << p << "]\n";
-	}
-	return;
-
-}
-
-void TestMaxLength(){
-
-	std::cout<<"(" << _maxlength << ")\n";
-
-}
-
-void TestGo2(){
-
-	for(int i=0; i<_maxlength; i++){
-		for(int j=0; j<MAXCHAR; j++){
-  			printf("%d", _go2[i][j]);
-		}
-		printf("\n");
-	}
-
-}
-
-void TestFail(){
-
-	for(int i=0; i<_maxlength; i++){
-		printf("[%d] ", _fail[i]);
-	}
-
-}
-
-
-
-
   AhoCorasick(std::vector<std::string> patterns){
     _patterns = patterns;
     _maxlength = this->GetMaxLength(patterns);
     _go2 = this->BuildFSM(_patterns);
     _fail = this->BuildFail();
+		_count.assign(_patterns.size(), 0);
+    _readedCount = 0;
   }
    ~AhoCorasick(){};
 
@@ -162,16 +128,18 @@ void reset() {
         _go2.clear();
         _patterns.clear();
         _maxlength = 0;
+				_readedCount = 0;
     }
 
 std::vector<int> count(){
   return _count;
 }
 
-void search(const std::string &text){
+bool search(const std::string &text, bool isCompleteLine){
 
-int state = 0;
-_count.assign(_patterns.size(), 0);
+int state = 0, n = text.length();
+bool ans = false;
+
 for(int i=0; i<text.size(); i++){
 
   state = Go2Next(text[i], state);
@@ -181,10 +149,17 @@ for(int i=0; i<text.size(); i++){
   for (int j = 0; j < _patterns.size(); j++){
     if (_occ[state] & (1 << j)){
       _count[j]++;
+			ans = true;
     }
   }
+
+	if (!isCompleteLine) {
+    _readedCount += n;
+  } else {
+    _readedCount = 0;
+  }
 }
-return;
+return ans;
 }
 
 
