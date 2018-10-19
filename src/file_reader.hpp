@@ -64,7 +64,8 @@ public:
         this->_filename = filename;
         
         if (!fileExists()){
-            throw std::runtime_error("File '" + this->_filename + "' not exist.");
+            printf("Error: file '%s' not exist.\n", this->_filename.c_str());
+            exit(-1);
         }
 
         this->_bytesRead = 0;
@@ -89,9 +90,11 @@ public:
      */
     int getLine(std::string& dest) {
 
-        if (_filename == "" || _bytesRead == 0 || this->_linePointer == NULL)
-            throw std::runtime_error("FileReader not initialized. Call FileReader::load() before get line.");
-
+        if (_filename == "" || _bytesRead == 0 || this->_linePointer == NULL){
+            printf("Error: fileReader not initialized. Call FileReader::load() before get line.");
+            exit(-1);
+        }
+        
         _linePointer++;
 
         int size = (int) ((_buffer + _bytesRead) - _linePointer);
@@ -156,8 +159,10 @@ private:
     void openFile() {
         _fileDescriptor = open(this->_filename.c_str(), O_RDONLY);
         
-        if (_fileDescriptor == -1)
-            throw std::runtime_error("Error tryin to open" + this->_filename + ".");
+        if (_fileDescriptor == -1){
+            printf("Error tryin to open %s.\n", this->_filename.c_str());
+            exit(-1);
+        }
 
         posix_fadvise(_fileDescriptor, 0, 0, 1); // FDADVICE_SEQUENTIAL
     }
