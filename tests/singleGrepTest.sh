@@ -1,8 +1,7 @@
 #!/bin/bash
 
-files="english50MB.txt"              
+files="english1024MB.txt"              
 
-algo="boyer-moore"
 wordlen=0
 myspace=" "
 
