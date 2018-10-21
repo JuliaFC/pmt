@@ -1,3 +1,14 @@
+/**
+ * @file boyer_moore.hpp
+ * @author Junior Lima (junior.lima.ivd.2@gmail.com)
+ * @brief Implements the Boyer Moore Algorithm for exact string matching
+ * @version 0.1
+ * @date 2018-10-18
+ * 
+ * @copyright Copyright (c) 2018
+ * 
+ */
+
 #ifndef BOYER_MOORE_H
 #define BOYER_MOORE_H
 
@@ -8,17 +19,64 @@
 #include <iostream>
 #include "searcher.hpp"
 
+
 class BoyerMoore : public Searcher
 {
 private:
+
+    /**
+     * @brief Stores the information about the bad char rule of Boyer Moore Algorithm.
+     * 
+     */
     std::unordered_map <char, int> _c;
+
+    /**
+     * @brief Stores the information about the bad suffix rule of Boyer Moore Algorithm.
+     * 
+     */
     std::vector<int> _s;
+
+    /**
+     * @brief String to be seached
+     * 
+     */
     std::string _pattern;
+
+    /**
+     * @brief Set of valid characters in the text
+     * 
+     */
     std::vector<char> _alphabeth;
+
+    /**
+     * @brief Stores the end of last text processed to possibly partial processing with Boyer Moore
+     * 
+     */
     std::string _lineprefix;
+
+    /**
+     * @brief Counts the number words of matches in the text.
+     * 
+     */
     int _count;
+
+    /**
+     * @brief Stores how many caracters was readed in the line. 
+     *        Its useful to get the position of a match where a line 
+     *        is feeded into the alrogithm partially.
+     * 
+     */
     int _readedCount;
 
+    /**
+     * @brief Builds a map<char, int> that works as a lookup table of the Bad Char rule.
+     *        For each unique char c in the pattern, the map stores the position of the last
+     *        Occourence of c in the pattern.
+     * 
+     * @param pattern String to be searched
+     * @param alphabeth Set of valid characters 
+     * @return std::unordered_map<char, int> The builded lookup table
+     */
     std::unordered_map<char, int> buildBadChar(const std::string& pattern, const std::vector<char> &alphabeth) {
         int m = pattern.size();
         int l = alphabeth.size();
@@ -31,6 +89,13 @@ private:
         return map;
     };
 
+    /**
+     * @brief Calculates the longest prefix that is also a suffix in the pattern
+     * 
+     * @param pattern String to be searched
+     * @return std::vector<int> Builded borded array, where each position i stores the longest
+     *                          prefix of the substring 0..i
+     */
     std::vector<int> border(const std::string& pattern) {
         int m = pattern.size();
         std::vector<int> next(m + 1, 0);
@@ -50,6 +115,12 @@ private:
         return next;
     };
 
+    /**
+     * @brief Builds the lookup vector of good suffix using the reverse border.
+     * 
+     * @param pattern String to be searched
+     * @return std::vector<int> Builded good suffix lookup vector
+     */
     std::vector<int> buildGoodSuffix(const std::string& pattern) {
         int m = pattern.size();
         std::string rev = pattern;
@@ -72,12 +143,28 @@ private:
     };
 
 public:
+    /**
+     * @brief Construct a new Boyer Moore object
+     * 
+     * @param pattern String to be searched
+     * @param alphabeth Set of valid characters
+     */
     BoyerMoore(const std::string& pattern, std::vector<char> alphabeth){
         this->setPattern(pattern, alphabeth);
     };
 
+    /**
+     * @brief Destroy the Boyer Moore object
+     * 
+     */
     ~BoyerMoore(){};
 
+    /**
+     * @brief Set a new Pattern object, a new alphabeth and reset the object
+     * 
+     * @param pattern String to be searched
+     * @param alphabeth Set of valid characters
+     */
     void setPattern(const std::string& pattern, std::vector<char> alphabeth){
         _pattern = pattern;
         _alphabeth = alphabeth;
@@ -88,6 +175,15 @@ public:
         _lineprefix.clear();
     }
 
+    /**
+     * @brief Searches the pattern in the text accordingly to the Boyer Moore Algorithm
+     * 
+     * @param text String where the pattern will be searched
+     * @param isCompleteLine Tells if the line is complete or the rest of the line will be feeded
+     *                       in the next interations
+     * @return true The pattern was found
+     * @return false The pattern was not found
+     */
     bool search(std::string text, bool isCompleteLine) {
         
         if (!_lineprefix.empty()) text = _lineprefix + text;
@@ -124,6 +220,10 @@ public:
         return ans;
     }
 
+    /**
+     * @brief Reset all attributes of the object
+     * 
+     */
     void reset() {
         _c.clear();
         _s.clear();
@@ -132,10 +232,20 @@ public:
         _count = 0;
     }
 
+    /**
+     * @brief Return the number of word matches in the past iterations
+     * 
+     * @return int 
+     */
     int count(){
         return _count;
     }
 
+    /**
+     * @brief Reset the object and sets a new pattern
+     * 
+     * @param pattern 
+     */
     void resetPattern(std::string pattern){
         _pattern = pattern;
         _c = buildBadChar(_pattern, _alphabeth);

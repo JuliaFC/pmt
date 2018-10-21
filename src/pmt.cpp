@@ -1,8 +1,19 @@
+/**
+ * @file pmt.cpp
+ * @author Junior Lima and Julia Feitosa (junior.lima.ivd.2@gmail.com and ...)
+ * @brief Frontend of the pmt software
+ * @version 0.1
+ * @date 2018-10-18
+ * 
+ * @copyright Copyright (c) 2018
+ * 
+ */
 #include <iostream>
 #include <getopt.h>
 #include <string>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 #include "file_reader.hpp"
 #include "boyer_moore.hpp"
 #include "sellers.hpp"
@@ -11,6 +22,10 @@
 
 using namespace std;
 
+/**
+ * @brief Enum of algorithms supported in the software
+ * 
+ */
 enum Algorithm
 {
       NONE,
@@ -20,6 +35,10 @@ enum Algorithm
       WU_MAMBER
 };
 
+/**
+ * @brief Stores all constraints about the string match to be performed
+ * 
+ */
 typedef struct RunInfo {
       vector<string> patterns;
       vector<string> textFiles;
@@ -30,6 +49,12 @@ typedef struct RunInfo {
 
 } RunInfo;
 
+/**
+ * @brief Open the file and returns a vector where each line is a considered a pattern
+ *        If the line is empty, the lien is not considered.
+ * @param filename The path of the pattern file
+ * @return vector<string> The vector of patterns
+ */
 vector<string> parserPatternFile(string filename){
       vector<string> p;
       FileReader f(filename);
@@ -49,18 +74,32 @@ vector<string> parserPatternFile(string filename){
       } while(ret != -1);
 }
 
+/**
+ * @brief Choose the best algorithm to process the matching acordingly to 
+ *        the type of search, number of patterns and size of pattern
+ * 
+ * @param info Constraits about the string match 
+ * @return Algorithm The selected algorithm
+ */
 Algorithm chooseAlgorithm(RunInfo info) {
       if (info.isExact) {
            if ( info.patterns.size() > 1 ) return AHO_CORASICK;
            else return BOYER_MOORE;
       } else {
-            if (info.patterns.size() > 1)
+            size_t maxSize = info.patterns[0].size();
+            for(int i=1; i<info.patterns.size(); i++) maxSize = max(maxSize, info.patterns[i].size());
+            if (maxSize > 64)
                   return SELLERS;
             else
                   return WU_MAMBER;
       }
 }
 
+/**
+ * @brief Execute the string match considering all the information stored in info
+ * 
+ * @param info Constraits about the string match 
+ */
 void executeAlgorithm(RunInfo info){
 
       Searcher * s;
@@ -77,7 +116,7 @@ void executeAlgorithm(RunInfo info){
                   break;
             }
             case AHO_CORASICK:{
-                  // TODO: implement reading;
+                  // TODO: implement aho corasick usage;
                   break;
             }
             case SELLERS:{
@@ -128,9 +167,9 @@ void executeAlgorithm(RunInfo info){
                   } while(ret != -1);
 
                   if (info.isCountMode) {
-                        printf("Total occurrences: %d\n", s->count());
+                        printf("Total occurrences: %d match(es) found.\n", s->count());
                   } else {
-                        printf("Number of lines: %d\n", lineCount);
+                        printf("Number of lines: %d match(es) found.\n", lineCount);
                   }
             }
 
@@ -179,7 +218,7 @@ int main(int argc, char *argv[])
 
                         if (info.chosenAlgorithm == NONE) {
                               printf("Invalid algorithm name.\n");
-                              exit(1);
+                              exit(-1);
                         }
                   
                   break;
@@ -215,7 +254,7 @@ int main(int argc, char *argv[])
 
                   case '?':
                         printf("Invalid argument. Please try again.\n");
-                        exit(1);
+                        exit(-1);
                   break;
                   default:
                         abort();
@@ -238,12 +277,12 @@ int main(int argc, char *argv[])
 
       if(info.isExact && (info.chosenAlgorithm == SELLERS || info.chosenAlgorithm == WU_MAMBER)){
             printf("Error: Algorithm %s is not suitable to exact matching.\n", pmt_algorithms[info.chosenAlgorithm - 1].c_str());
-            exit(1);
+            exit(-1);
       }
 
       if (!info.isExact && (info.chosenAlgorithm == BOYER_MOORE || info.chosenAlgorithm == AHO_CORASICK)) {
             printf("Error: Algorithm %s is not suitable to approximate matching.\n", pmt_algorithms[info.chosenAlgorithm - 1].c_str());
-            exit(1);
+            exit(-1);
       }
 
       executeAlgorithm(info);
