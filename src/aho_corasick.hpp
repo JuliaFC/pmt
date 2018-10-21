@@ -1,3 +1,14 @@
+/**
+ * @file boyer_moore.hpp
+ * @author Júlia Feitosa (mjfc@cin.ufpe.br)
+ * @brief Implements the Aho Corasick algorithm for multiple pattern string matching
+ * @version 0.3
+ * @date 2018-10-20
+ * 
+ * @copyright Copyright (c) 2018
+ * 
+ */
+
 #include <vector>
 #include <string>
 #include <queue>
