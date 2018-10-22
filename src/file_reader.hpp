@@ -164,7 +164,7 @@ private:
             exit(-1);
         }
 
-        posix_fadvise(_fileDescriptor, 0, 0, 1); // FDADVICE_SEQUENTIAL
+        //posix_fadvise(_fileDescriptor, 0, 0, 1); // FDADVICE_SEQUENTIAL
     }
 };
 
