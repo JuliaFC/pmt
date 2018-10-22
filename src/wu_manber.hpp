@@ -131,6 +131,7 @@ public:
         _charMask = this->buildCharMask(_pattern, _alphabeth);
         _distance = distance;
         _readedCount = 0;
+        _s.clear();
     ;}
 
     /**
@@ -201,9 +202,7 @@ public:
      */
     void reset(){
         _pattern.clear();
-        _alphabeth.clear();
         _count =0;
-        _distance = 0;
         _charMask.clear();
         _s.clear();
     }

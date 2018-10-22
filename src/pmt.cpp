@@ -72,6 +72,8 @@ vector<string> parserPatternFile(string filename){
             }
             ret = f.getLine(line);
       } while(ret != -1);
+
+      return p;
 }
 
 /**
