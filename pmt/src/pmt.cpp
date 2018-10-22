@@ -130,11 +130,11 @@ void executeAlgorithm(RunInfo info){
 
                   if (info.isCountMode) {
 
-												if (info.chosenAlgorithm == AHO_CORASICK) {
-													s->count();
-												} else {
-                        	printf("Total occurrences: %d\n", s->count());
-												}
+		if (info.chosenAlgorithm == AHO_CORASICK) {
+			s->count();
+		} else {
+                       printf("Total occurrences: %d\n", s->count());
+		}
 
                   } else {
                         printf("Number of lines: %d\n", lineCount);
